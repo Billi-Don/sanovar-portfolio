@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanovar Bains — Tool & Die | CNC Machinist</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest: #2D4A3E;
+    --stone: #8B7355;
+    --steel: #1a1a1a;
+    --offwhite: #F4F1EC;
+    --warm: #E8E0D4;
+    --light-stone: #C4A882;
+    --text: #2C2C2C;
+    --muted: #7A7268;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--steel);
+    color: var(--offwhite);
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--stone);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--stone);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.25s ease;
+    opacity: 0.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 60px;
+    background: linear-gradient(to bottom, rgba(26,26,26,0.95), transparent);
+    backdrop-filter: blur(8px);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--light-stone);
+  }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--warm);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--stone); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 160px 60px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--stone);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--stone);
+  }
+
+  .hero-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 8vw, 120px);
+    line-height: 0.9;
+    color: var(--offwhite);
+    margin-bottom: 8px;
+  }
+  .hero-name span { color: var(--stone); }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 3vw, 44px);
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+  }
+
+  .hero-bio {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #A89F95;
+    max-width: 440px;
+    margin-bottom: 48px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--stone);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .hero-cta {
+    display: flex; gap: 16px;
+  }
+  .btn-primary {
+    background: var(--stone);
+    color: var(--offwhite);
+    padding: 14px 32px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--light-stone); }
+  .btn-outline {
+    background: transparent;
+    color: var(--warm);
+    padding: 14px 32px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--stone); color: var(--stone); }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--forest) 0%, #1a2e26 50%, #0d1a14 100%);
+    opacity: 0.9;
+  }
+
+  /* Animated gear SVG background */
+  .gear-bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.08;
+  }
+  .gear-svg { animation: spin 30s linear infinite; }
+  .gear-svg-2 { animation: spin 20s linear infinite reverse; position: absolute; top: 20%; right: 10%; opacity: 0.15; }
+
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .hero-right-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 160px 60px 80px;
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .skill-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 20px;
+    transition: all 0.3s;
+  }
+  .skill-card:hover {
+    background: rgba(139,115,85,0.12);
+    border-color: rgba(139,115,85,0.3);
+    transform: translateY(-2px);
+  }
+  .skill-icon {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .skill-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--stone);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .skill-desc {
+    font-size: 12px;
+    color: #7A7268;
+    line-height: 1.5;
+  }
+
+  /* Scroll indicator */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 60px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--stone), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 120px 60px;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--stone);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(139,115,85,0.2);
+    max-width: 80px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 6vw, 80px);
+    line-height: 0.95;
+    color: var(--offwhite);
+    margin-bottom: 60px;
+  }
+
+  /* EXPERIENCE TIMELINE */
+  .experience { background: #141414; }
+
+  .timeline {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 0;
+    max-width: 900px;
+  }
+  .timeline-item {
+    display: contents;
+  }
+  .timeline-date {
+    padding: 32px 40px 32px 0;
+    border-right: 1px solid rgba(139,115,85,0.2);
+    position: relative;
+  }
+  .timeline-date::after {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--stone);
+    border-radius: 50%;
+    position: absolute;
+    right: -4.5px;
+    top: 40px;
+  }
+  .timeline-date-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--stone);
+    text-transform: uppercase;
+  }
+  .timeline-content {
+    padding: 28px 0 28px 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .timeline-item:last-child .timeline-content { border-bottom: none; }
+  .timeline-company {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--offwhite);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .timeline-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--stone);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .timeline-desc {
+    font-size: 14px;
+    color: #7A7268;
+    line-height: 1.8;
+    max-width: 560px;
+  }
+  .timeline-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .tag {
+    background: rgba(139,115,85,0.1);
+    border: 1px solid rgba(139,115,85,0.2);
+    padding: 4px 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--stone);
+    text-transform: uppercase;
+  }
+
+  /* PROJECTS */
+  .projects { background: var(--steel); }
+
+  .projects-filter {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--muted);
+    padding: 8px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: var(--stone);
+    border-color: var(--stone);
+    color: var(--offwhite);
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .project-card {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: #1e1e1e;
+    cursor: pointer;
+  }
+  .project-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease, filter 0.6s ease;
+    filter: grayscale(30%) brightness(0.75);
+  }
+  .project-card:hover img {
+    transform: scale(1.06);
+    filter: grayscale(0%) brightness(0.9);
+  }
+  .project-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(26,26,26,0.92) 0%, transparent 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 28px;
+    transform: translateY(8px);
+    transition: transform 0.3s ease;
+  }
+  .project-card:hover .project-overlay { transform: translateY(0); }
+  .project-category {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--stone);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .project-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--offwhite);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .project-desc {
+    font-size: 12px;
+    color: #9A9288;
+    line-height: 1.6;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.3s ease 0.05s;
+  }
+  .project-card:hover .project-desc {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* SOFTWARE SECTION */
+  .software { background: #0f0f0f; }
+
+  .software-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+  }
+  .software-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 40px 32px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .software-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--stone);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+  .software-card:hover::before { transform: scaleX(1); }
+  .software-card:hover {
+    background: rgba(139,115,85,0.06);
+  }
+  .software-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    color: rgba(139,115,85,0.12);
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+  .software-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: var(--offwhite);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .software-level {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--stone);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .software-bar {
+    height: 2px;
+    background: rgba(255,255,255,0.06);
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .software-bar-fill {
+    height: 100%;
+    background: var(--stone);
+    transition: width 1.5s ease;
+  }
+  .software-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* CONTACT */
+  .contact {
+    background: var(--forest);
+    text-align: center;
+    padding: 120px 60px;
+  }
+  .contact-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 8vw, 120px);
+    line-height: 0.9;
+    color: var(--offwhite);
+    margin-bottom: 24px;
+  }
+  .contact-title span { color: var(--light-stone); }
+  .contact-sub {
+    font-size: 16px;
+    color: rgba(244,241,236,0.5);
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+  .contact-email {
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    color: var(--light-stone);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(196,168,130,0.3);
+    padding-bottom: 4px;
+    transition: border-color 0.2s;
+  }
+  .contact-email:hover { border-color: var(--light-stone); }
+
+  /* FOOTER */
+  footer {
+    background: #0d0d0d;
+    padding: 32px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--muted);
+  }
+  .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #3A3A3A;
+    letter-spacing: 1px;
+  }
+
+  /* FADE IN ANIMATION */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* NOTICE BANNER */
+  .notice {
+    background: rgba(139,115,85,0.15);
+    border: 1px solid rgba(139,115,85,0.3);
+    padding: 16px 24px;
+    margin: 0 60px 40px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--stone);
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    nav { padding: 20px 24px; }
+    .nav-links { gap: 24px; }
+    section { padding: 80px 24px; }
+    .projects-grid { grid-template-columns: 1fr 1fr; }
+    .software-grid { grid-template-columns: 1fr 1fr; }
+    .timeline { grid-template-columns: 1fr; }
+    .timeline-date { border-right: none; border-bottom: 1px solid rgba(139,115,85,0.2); padding-bottom: 12px; }
+    .timeline-date::after { display: none; }
+    .timeline-content { padding: 16px 0; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+    nav { padding: 20px 24px; }
+    .hero-left { padding: 120px 24px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">SB</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#software">Skills</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="about">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Tool & Die  •  CNC Machinist  •  Mississauga, ON</div>
+    <h1 class="hero-name">SANOVAR<br><span>BAINS</span></h1>
+    <p class="hero-title">Precision. Craft. Tradesman.</p>
+    <p class="hero-bio">
+      Skilled Tool & Die tradesperson with 6+ years of hands-on experience in progressive die fabrication, repair, and CNC machining across aerospace, automotive, and industrial environments. Currently pursuing Red Seal 430A certification.
+    </p>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">6+</div>
+        <div class="stat-label">Years<br>Experience</div>
+      </div>
+      <div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">Shops &<br>Industries</div>
+      </div>
+      <div>
+        <div class="stat-num">430A</div>
+        <div class="stat-label">Red Seal<br>In Progress</div>
+      </div>
+    </div>
+    <div class="hero-cta">
+      <a href="#projects" class="btn-primary">View My Work</a>
+      <a href="mailto:sanovarbains@gmail.com" class="btn-outline">Get in Touch</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="gear-bg">
+      <svg class="gear-svg" width="500" height="500" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M43.3 5.3l-1.9 7.3a30 30 0 00-8.5 3.5l-7-3.6L20 18.4l3.6 7a30 30 0 00-3.5 8.5l-7.3 1.9v8.4l7.3 1.9a30 30 0 003.5 8.5l-3.6 7 5.9 5.9 7-3.6a30 30 0 008.5 3.5l1.9 7.3h8.4l1.9-7.3a30 30 0 008.5-3.5l7 3.6 5.9-5.9-3.6-7a30 30 0 003.5-8.5l7.3-1.9v-8.4l-7.3-1.9a30 30 0 00-3.5-8.5l3.6-7-5.9-5.9-7 3.6a30 30 0 00-8.5-3.5L51.7 5.3z" stroke="white" stroke-width="2" fill="none"/>
+        <circle cx="50" cy="50" r="15" stroke="white" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+    <div class="hero-right-content">
+      <div class="section-label" style="margin-bottom: 32px;">Core Capabilities</div>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <div class="skill-icon">⚙️</div>
+          <div class="skill-name">Die Fabrication</div>
+          <div class="skill-desc">Progressive dies, punches, trim steels, pierce operations</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">🔩</div>
+          <div class="skill-name">CNC Machining</div>
+          <div class="skill-desc">3–5 axis milling, Fanuc, Heidenhain, Okuma controls</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">📐</div>
+          <div class="skill-name">GD&T / Blueprints</div>
+          <div class="skill-desc">Complex aerospace and automotive engineering drawings</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">🛠️</div>
+          <div class="skill-name">Die Troubleshooting</div>
+          <div class="skill-desc">Root cause analysis, corrective machining, repair</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">💻</div>
+          <div class="skill-name">CAM Programming</div>
+          <div class="skill-desc">Mastercam, VISI tool design, CadKey 2D drafting</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon">🔬</div>
+          <div class="skill-name">Precision Inspection</div>
+          <div class="skill-desc">Micrometers, bore gauges, calipers, surface comparators</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="experience" id="experience">
+  <div class="section-label fade-up">Career</div>
+  <h2 class="section-title fade-up">Work<br>Experience</h2>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-date">
+        <div class="timeline-date-text">Sep 2019<br>Nov 2024</div>
+      </div>
+      <div class="timeline-content fade-up">
+        <div class="timeline-company">Wolfedale Tool & Stamping</div>
+        <div class="timeline-role">Tool & Die Apprentice / CNC Machinist — Mississauga, ON</div>
+        <div class="timeline-desc">
+          Spent five years building the full trade from the ground up at a dedicated tool and die job shop. Fabricated, repaired, and maintained progressive dies and precision tooling for automotive and industrial clients. Developed expertise in die failure diagnosis, corrective machining, and assembly. Programmed and machined components using Mastercam and VISI, and produced 2D engineering drawings in CadKey.
+        </div>
+        <div class="timeline-tags">
+          <span class="tag">Progressive Dies</span>
+          <span class="tag">Mastercam</span>
+          <span class="tag">VISI Assemblies</span>
+          <span class="tag">CadKey</span>
+          <span class="tag">Die Repair</span>
+          <span class="tag">GD&T</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">
+        <div class="timeline-date-text">Nov 2024<br>Oct 2025</div>
+      </div>
+      <div class="timeline-content fade-up">
+        <div class="timeline-company">Universal Precision Technology</div>
+        <div class="timeline-role">CNC Machinist – Aerospace & Defense — Stoney Creek, ON</div>
+        <div class="timeline-desc">
+          Machined close-tolerance aerospace and defense components on 3–5 axis CNC mills using Heidenhain and Okuma controls. Programmed toolpaths in Mastercam from engineering drawings, performed tool offsets, cutter changes, and in-process dimensional inspection. Troubleshot machining and tooling non-conformances in a high-precision production environment.
+        </div>
+        <div class="timeline-tags">
+          <span class="tag">3–5 Axis CNC</span>
+          <span class="tag">Aerospace</span>
+          <span class="tag">Mastercam</span>
+          <span class="tag">Heidenhain</span>
+          <span class="tag">Okuma</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">
+        <div class="timeline-date-text">Oct 2025<br>Present</div>
+      </div>
+      <div class="timeline-content fade-up">
+        <div class="timeline-company">EUROWERX</div>
+        <div class="timeline-role">CNC Machinist — Mississauga, ON</div>
+        <div class="timeline-desc">
+          Setting up and operating 3-axis CNC mills to produce close-tolerance components for industrial and commercial clients. Interpret engineering drawings to determine machining sequences and verify dimensional accuracy using precision measuring instruments.
+        </div>
+        <div class="timeline-tags">
+          <span class="tag">3-Axis CNC</span>
+          <span class="tag">Precision Inspection</span>
+          <span class="tag">Quality Control</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="projects" id="projects">
+  <div class="section-label fade-up">Portfolio</div>
+  <h2 class="section-title fade-up">My Work</h2>
+
+  <div class="projects-filter fade-up">
+    <button class="filter-btn active">All</button>
+    <button class="filter-btn">Machined</button>
+    <button class="filter-btn">VISI Assemblies</button>
+    <button class="filter-btn">Mastercam</button>
+    <button class="filter-btn">SolidWorks</button>
+  </div>
+
+  <div class="projects-grid fade-up">
+
+    <div class="project-card">
+      <img src="https://lh3.googleusercontent.com/sitesv/APaQ0ST94Zg-NGvHHugSMTYIShPsddkiSqOVsLEWhJyB5v0qLd1_VPthLXhBvge_9gejtfG-Itn1NQkM9bSw459qn83T94Zg-NGvHHugSMTYIShPsddkiSqOVsLEWhJyB5v0qLd1_VPthLXhBvge_9gejtfG-Itn1NQkM9bSw459qn83PaBaBd5a0fLwrt9JngtVvRjnEbi1o-qO_6Uf0gMsIY1qH8HPDhDKUYeOOOqCVDQibKgyvdTte1ug8AiYwwSiyvNKWcOskXurerSSZc5Yzp3sdLiotaGUzRw2W_FrB-iTAzGFrWXhlhoOkE=w1280" alt="Progression Die"
+        onerror="this.src='https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600&q=80'">
+      <div class="project-overlay">
+        <div class="project-category">Machined</div>
+        <div class="project-name">Progression Die</div>
+        <div class="project-desc">Working 3-step progression die built using mill, lathe, CNC mill, EDM, and surface grinder.</div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <img src="https://lh3.googleusercontent.com/sitesv/APaQ0SQJIrjkn8kGcGflHu94N7kEMgq5_2D9nFXRVdvoMmw3oIcgmO_bWPJQnVM9iiGNz2BcNaqa3tKJEMUcXzQLoaJzWTpwjfmbZHTEqP7B3Y94KElmbNpowuE3lyXKxIExcg5qfUmCCXyMV7rtvnpdkCvxs_wJwVmKyi8sgbE1LDP3P_oU_QCthsj1T41lhIDSMKB32iw_CBziEHtA75m66z8eG1SlZSWFiv2P=w1280" alt="Spinning Fixture"
+        onerror="this.src='https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80'">
+      <div class="project-overlay">
+        <div class="project-category">Machined</div>
+        <div class="project-name">Spinning Fixture</div>
+        <div class="project-desc">Custom fixture for grinding cylindrical, angular, and concentric forms on punches.</div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <img src="https://images.unsplash.com/photo-1581093458791-9d15482442f6?w=600&q=80" alt="VISI Assembly">
+      <div class="project-overlay">
+        <div class="project-category">VISI Assembly</div>
+        <div class="project-name">Die Assembly — Wolfedale</div>
+        <div class="project-desc">Complete progressive die assembly modelled and designed in VISI for automotive stamping application.</div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600&q=80" alt="Mastercam Program">
+      <div class="project-overlay">
+        <div class="project-category">Mastercam</div>
+        <div class="project-name">CNC Toolpath Programs</div>
+        <div class="project-desc">Mastercam toolpath programs developed from engineering drawings and CAD models for precision die components.</div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <img src="https://lh3.googleusercontent.com/sitesv/APaQ0SQUW3tJX9OKiPtVX6vXRYvv3e9UqsA7_Y_cAvPVMEmcsjXADGJuH_zzykLPn-Rth33FNxGrzFJhVF_IUrW1IU4p-jLonqRQPP1gnQfmzIWcPEriv8QZNUUPpcifu4czAaPFjl072ssBs1Q5VI1-hgW6Z6TlUNrvgKUDr393Uy3-vnDB4utLlLItzgIEfL1OOYC0mZVevp1TfCFXHD0_FJh-91cPasgFPeSNub8=w1280" alt="Drone Body"
+        onerror="this.src='https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=600&q=80'">
+      <div class="project-overlay">
+        <div class="project-category">SolidWorks</div>
+        <div class="project-name">Drone Framework</div>
+        <div class="project-desc">Lightweight drone body designed for 3D printing with modular electronics mounting and easy repairability.</div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <img src="https://lh3.googleusercontent.com/sitesv/APaQ0SS9ii_DZRaiw6P-l8JzsBhGhLv95OiRqQXXWBjAnCWlYA8U_HunUkh42BKt445DKCkVTzVOFD8IyrW1IU4p-jLonqRQPP1gnQfmzIWcPEriv8QZNUUPpcifu4czAaPFjl072ssBs1Q5VI1-hgW6Z6TlUNrvgKUDr393Uy3-vnDB4utLlLItzgIEfL1OOYC0mZVevp1TfCFXHD0_FJh-91cPasgFPeSNub8=w1280" alt="3 Jaw Puller"
+        onerror="this.src='https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80'">
+      <div class="project-overlay">
+        <div class="project-category">SolidWorks</div>
+        <div class="project-name">3-Jaw Bearing Puller</div>
+        <div class="project-desc">Full assembly with motion study designed from scratch in SolidWorks.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SOFTWARE -->
+<section class="software" id="software">
+  <div class="section-label fade-up">Technical Skills</div>
+  <h2 class="section-title fade-up">Software &<br>Proficiency</h2>
+
+  <div class="software-grid fade-up">
+    <div class="software-card">
+      <div class="software-num">01</div>
+      <div class="software-name">Mastercam</div>
+      <div class="software-level">Advanced</div>
+      <div class="software-bar"><div class="software-bar-fill" style="width: 85%"></div></div>
+      <div class="software-desc">Full toolpath programming from engineering drawings and CAD models across 3–5 axis milling operations at Wolfedale and Universal Precision.</div>
+    </div>
+    <div class="software-card">
+      <div class="software-num">02</div>
+      <div class="software-name">VISI</div>
+      <div class="software-level">Intermediate</div>
+      <div class="software-bar"><div class="software-bar-fill" style="width: 65%"></div></div>
+      <div class="software-desc">3D tool design, die assembly modelling, and manufacturing support across 5 years of professional tool and die work at Wolfedale.</div>
+    </div>
+    <div class="software-card">
+      <div class="software-num">03</div>
+      <div class="software-name">CadKey</div>
+      <div class="software-level">Intermediate</div>
+      <div class="software-bar"><div class="software-bar-fill" style="width: 60%"></div></div>
+      <div class="software-desc">2D mechanical drawing creation, dimensioning, and revision from VISI-exported models over approximately 2 years at Wolfedale.</div>
+    </div>
+    <div class="software-card">
+      <div class="software-num">04</div>
+      <div class="software-name">SolidWorks</div>
+      <div class="software-level">Working Knowledge</div>
+      <div class="software-bar"><div class="software-bar-fill" style="width: 45%"></div></div>
+      <div class="software-desc">3D modelling, assembly design, and motion studies including drone framework, compression engine, and 3-jaw bearing puller projects.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="section-label fade-up" style="justify-content: center; margin-bottom: 24px;">Let's Connect</div>
+  <h2 class="contact-title fade-up">GET IN<br><span>TOUCH</span></h2>
+  <p class="contact-sub fade-up">Open to opportunities in tool & die, CNC machining, and precision manufacturing.</p>
+  <a href="mailto:sanovarbains@gmail.com" class="contact-email fade-up">sanovarbains@gmail.com</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">SANOVAR BAINS</div>
+  <div class="footer-copy">© 2026 — Tool & Die Maker | CNC Machinist | Mississauga, ON</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursor.style.left = mouseX - 6 + 'px';
+    cursor.style.top = mouseY - 6 + 'px';
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX - 18) * 0.12;
+    ringY += (mouseY - ringY - 18) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Scroll fade-in
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Filter buttons (visual only)
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Animate skill bars on scroll
+  const barObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.software-bar-fill').forEach(bar => {
+          bar.style.width = bar.style.width;
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelector('.software-grid') && barObserver.observe(document.querySelector('.software-grid'));
+</script>
+
+</body>
+</html>
